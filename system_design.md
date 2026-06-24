@@ -1,45 +1,33 @@
 ```mermaid
-flowchart TD
-    U[User]
-    R[Response]
+%% User → WhatsApp → OpenClaw Runtime → Skill Selector → Tool Execution → Memory Update → Response → User
 
+flowchart TD
     subgraph Channels
         WA[WhatsApp]
         EM[email]
         WEB[web]
     end
-
-
     subgraph OR[OpenClaw Runtime]
         O[orchestrator]
         S[sessions]
     end
-
-
     subgraph Skills
         PS[propretySearch]
         MS[marketStats]
         RAG[RAG]
     end
-
-    subgraph TE[Tool Execution]
-        TAF[typed async functions]
+    subgraph DB[MySQL Databases]
+        RP[rets_property]
+        CS[california_sold]
     end
 
-    subgraph MU[Memory Update]
-        ST[shortTerm: session state]
-        LT[longTerm: vector store]
-    end
-
-
-    U --> WA & EM & WEB
-    Channels --> O & S
-    OR --> PS & MS & RAG
-    Skills --> TAF
-    TE --> ST & LT
-    MU --> R
-    R --> U
-
-
+    U[User] --> WA & EM & WEB
+    Channels --> S --> O --> PS & MS & RAG
+    S --> ST[shortTerm: session state]
+    LT[longTerm: vector store] --> RAG
+    Skills --> TE[Tools: types asynch functions] --> ST
+    PS --> RP
+    MS --> CS
+    ST --> R[Response] --> U[User]
 
 ```
