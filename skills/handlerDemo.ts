@@ -13,11 +13,19 @@ export async function handleMessage(message: string) {
     };
   }
 
-  if (message.toLowerCase().includes("city")) {
+  if (message.toLowerCase().includes("market")) {
     return {
-      response: "Finding homes in that city",
+      response: "Checking the current market...",
     };
   }
 
   return { response: "I could not understand the request." };
 }
+
+async function main() {
+  console.log(await handleMessage("What time is it?"));
+  console.log(await handleMessage("Show me some listings"));
+  console.log(await handleMessage("How is the market?"));
+}
+
+main();
