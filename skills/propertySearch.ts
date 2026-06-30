@@ -16,7 +16,7 @@ export interface PropertyFilter {
 }
 
 function replaceAsLiteral(s: string): string {
-  return s.replace(/[.*+?^${}()|[\][\\]]/g, "\\$&");
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function findCity(query: string): string | undefined {
