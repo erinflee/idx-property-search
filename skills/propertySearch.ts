@@ -6,12 +6,12 @@ import cities from "./cities.json";
 export interface PropertyFilter {
   city?: string;
   maxPrice?: number;
-  minBed?: number;
-  minBath?: number;
-  minSqft?: number;
-  property?: string;
+  beds?: number;
+  baths?: number;
+  sqft?: number;
+  type?: string;
   pool?: string;
-  view?: string;
+  hasView?: string;
   maxHoa?: number;
 }
 
@@ -35,6 +35,8 @@ export function parsePropertyQuery(query: string): PropertyFilter {
   // define patterns to be used for extracting info
   const city = findCity(query);
   const priceMatch = query.match(/(?:under|below|less\s+than|no\s+more\s+than|max|up\s+to|within|≤|cheaper\s+than)\s*\$?([\d,.]+)(k|m)?/i);
+  const priceFallback = priceMatch ? null : query.match(/\$\s?([\d,]+(?:\.\d+)?)\s*(k|m)?\b/i);
+  const priceSource = priceMatch ?? priceFallback;
   const bedMatch = query.match(/\b(\d+)[\s-]*(?:room|rooms|bed|beds|bedroom|bedrooms)/i);
   const bathMatch = query.match(/\b(\d+(?:\.\d+)?)[\s-]*(?:bath|baths|bathroom|bathrooms)/i);
   const sqftMatch = query.match(/\b(\d[\d,]*)[\s-]*(?:sqft|sq\s+ft|square\s+feet|sq\.\s+ft\.|sf)/i);
@@ -55,26 +57,27 @@ export function parsePropertyQuery(query: string): PropertyFilter {
     "single family": "SingleFamilyResidence",
     sfr: "SingleFamilyResidence",
     house: "SingleFamilyResidence",
+    land: "UnimprovedLand",
   };
 
   const propertyMatch = Object.keys(propertyMap).find((k) => new RegExp(`\\b${replaceAsLiteral(k)}\\b`, "i").test(query));
 
   // use patterns from above and find all matches with query
   if (city) filter.city = city;
-  if (priceMatch) {
-    let maxPrice = Number(priceMatch[1].replace(/,/g, ""));
-    const suffix = priceMatch[2]?.toLowerCase();
+  if (priceSource) {
+    let maxPrice = Number(priceSource[1].replace(/,/g, ""));
+    const suffix = priceSource[2]?.toLowerCase();
     if (suffix === "k") maxPrice *= 1000;
     if (suffix === "m") maxPrice *= 1000000;
-    filter.maxPrice = maxPrice;
+    if (suffix || maxPrice >= 10000) filter.maxPrice = maxPrice;
   }
-  if (bedMatch) filter.minBed = Number(bedMatch[1]);
-  if (bathMatch) filter.minBath = Number(bathMatch[1]);
-  if (sqftMatch) filter.minSqft = Number(sqftMatch[1].replace(/,/g, ""));
+  if (bedMatch) filter.beds = Number(bedMatch[1]);
+  if (bathMatch) filter.baths = Number(bathMatch[1]);
+  if (sqftMatch) filter.sqft = Number(sqftMatch[1].replace(/,/g, ""));
   if (poolMatch && !poolNegated) filter.pool = "1";
-  if (viewMatch && !viewNegated) filter.view = "1";
+  if (viewMatch && !viewNegated) filter.hasView = "1";
   if (hoaMatch) filter.maxHoa = Number(hoaMatch[1].replace(/,/g, ""));
-  if (propertyMatch) filter.property = propertyMap[propertyMatch];
+  if (propertyMatch) filter.type = propertyMap[propertyMatch];
 
   return filter;
 }
