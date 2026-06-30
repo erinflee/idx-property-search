@@ -25,8 +25,9 @@ export function parsePropertyQuery(query: string): PropertyFilter {
   const sqftMatch = query.match(/\b(\d[\d,]*)[\s-]*(?:sqft|sq\s+ft|square\s+feet|sq\.\s+ft\.|sf)/i);
   const poolMatch = query.match(/\b(?:swimming\s+)?pools?\b/i);
   const viewMatch = query.match(/\bviews?\b/i)
-  const hoaMatch = 
-
+  const hoaBefore = query.match(/\b\$?(\d[\d,]*)\D{0,15}(?:hoa|dues?|fees?|association\s+fees?)/i)
+  const hoaAfter = query.match(/\b(?:hoa|dues?|fees?|association\s+fees?)\D{0,15}\$?(\d[\d,]*)/i)
+  const hoaMatch = hoaBefore ?? hoaAfter;
   
 
   const propertyMatch = // needs different structure than the rest, do this later...
@@ -64,6 +65,10 @@ export function parsePropertyQuery(query: string): PropertyFilter {
 
   if (viewMatch) {
     filter.view = 1;
+  }
+
+  if (hoaMatch) {
+    filter.maxHoa = Number(hoaMatch[1].replace(/,/g, ""));
   }
 
   return filter;
