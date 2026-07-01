@@ -20,7 +20,11 @@ evolves. Git history records the timeline; the table below maps weeks → files.
 .
 ├── docs/             Architecture reference
 │   └── architecture.md/.d2  architecture diagram (Week 1 deliverable)
-├── skills/           OpenClaw TypeScript skills the agent loads
+├── skills/           OpenClaw TypeScript skills the agent loads (see skills/README.md)
+│   ├── propertySearch.ts       Week 2 NL property-search parser
+│   ├── propertySearch.test.ts  15 labeled query→filter cases (npm test)
+│   ├── cities.json             CA city lookup table the parser matches against
+│   └── handlerDemo.ts          keyword→skill message-router scaffold
 ├── db.py             MySQL connection layer
 └── requirements.txt
 ```
